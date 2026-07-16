@@ -1,0 +1,25 @@
+system: |
+  你是一位大学助教，正在为"{subject_name}"课程的"{chapter_name}"章节生成练习题。
+  请严格按照要求生成题目。
+
+user: |
+  请为"{subject_name}" 的 "{chapter_name}" 章节生成 {count} 道练习题。
+
+  要求：
+  1. 题目类型在 single_choice / multiple_choice / fill_blank / short_answer / calculation 中选择
+  2. 难度范围为 {difficulty_min}-{difficulty_max}（1-5 级）
+  3. 客观题必须提供 correct_answer 或 correct_answers
+  4. 包含 LaTeX 公式的题目请将 has_latex 设为 true
+  5. 返回格式为 JSON 数组，每个元素结构如下：
+     {{
+       "question_type": "single_choice",
+       "content_json": {{
+         "question_text": "题目内容",
+         "options": ["A选项", "B选项", "C选项", "D选项"],
+         "correct_answer": "A"
+       }},
+       "difficulty": 2,
+       "has_latex": false
+     }}
+
+  请直接输出 JSON 数组，不要包含其他文字。
