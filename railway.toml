@@ -1,0 +1,8 @@
+[build]
+builder = "nixpacks"
+buildCommand = "pip install -r backend/requirements.txt"
+watchPatterns = ["backend/**", "railway.toml"]
+
+[deploy]
+startCommand = "cd backend && bash start.sh"
+healthcheckPath = "/api/health"
