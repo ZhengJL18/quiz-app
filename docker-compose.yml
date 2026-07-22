@@ -1,0 +1,98 @@
+# 一课一练 · Quiz App
+# Docker Compose — production deployment
+#
+# Quick start:
+#   1. cp .env.production.example .env   # edit secrets
+#   2. docker compose up -d
+#   3. docker compose exec backend python scripts/seed_data.py
+
+services:
+  # ── Backend API ──────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quiz-backend
+    volumes:
+      - quiz-data:/app/data
+      - ./.env:/app/.env:ro
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - quiz-net
+
+  # ── PostgreSQL (optional — for production scale) ──
+  postgres:
+    image: postgres:16-alpine
+    container_name: quiz-postgres
+    environment:
+      POSTGRES_USER: quiz
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-quiz-secret}
+      POSTGRES_DB: quiz
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - quiz-net
+    profiles: ["prod"]  # only with --profile prod
+
+  # ── Redis (optional — for multi-worker state) ──
+  redis:
+    image: redis:7-alpine
+    container_name: quiz-redis
+    restart: unless-stopped
+    networks:
+      - quiz-net
+    profiles: ["prod"]  # only with --profile prod
+
+  # ── Nginx reverse proxy + static files ────────
+  nginx:
+    image: nginx:alpine
+    container_name: quiz-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend/dist:/usr/share/nginx/html:ro
+      # SSL certificates (created by setup-ssl.sh)
+      - certbot-www:/var/www/certbot:ro
+      - certbot-conf:/etc/letsencrypt:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - quiz-net
+
+  # ── Uptime Kuma (monitoring + email alerts) ──
+  monitor:
+    image: louislam/uptime-kuma:1
+    container_name: quiz-monitor
+    ports:
+      - "3001:3001"
+    volumes:
+      - kuma-data:/app/data
+    restart: unless-stopped
+    networks:
+      - quiz-net
+
+# ── Named volumes for persistence ────────────
+volumes:
+  quiz-data:        # SQLite database
+  pg-data:          # PostgreSQL data (prod only)
+  kuma-data:        # Uptime Kuma config (monitors + alert settings)
+  certbot-www:      # Let's Encrypt webroot
+  certbot-conf:     # Let's Encrypt certificates
+
+# ── Internal network ─────────────────────────
+networks:
+  quiz-net:
+    driver: bridge

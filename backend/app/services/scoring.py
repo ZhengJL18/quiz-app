@@ -1,6 +1,7 @@
 """Scoring engine for objective question types."""
 
 import json
+import re
 from app.db.models import Question
 
 
@@ -14,6 +15,19 @@ def _parse_content_json(question: Question) -> dict:
 def _normalize(text: str) -> str:
     """Strip whitespace and lowercase for comparison."""
     return text.strip().lower()
+
+
+def _choice_to_index(value: str) -> str:
+    """Normalize choice answers: A→0, B→1, etc. Handles both letter and numeric formats.
+
+    Also handles mixed input like 'A' → '0', '0' → '0'.
+    """
+    v = value.strip().upper()
+    # Letter → index: A→0, B→1, C→2, D→3, E→4, F→5, G→6, H→7
+    if re.match(r'^[A-H]$', v):
+        return str(ord(v) - ord('A'))
+    # Already numeric: return as-is
+    return v
 
 
 def _parse_user_answers(user_answer: str) -> list[str]:
@@ -39,25 +53,16 @@ def grade_answer(question: Question, user_answer: str) -> bool | None:
 
     Returns:
         bool — correct or incorrect
-        None — question type requires AI grading (short_answer, calculation, proof)
+        None — question type requires self-grading (fill_blank, short_answer, calculation, proof)
     """
     content = _parse_content_json(question)
 
     if question.question_type == "single_choice":
-        correct = content.get("correct_answer", "")
-        return _normalize(user_answer) == _normalize(str(correct))
+        correct = _choice_to_index(str(content.get("correct_answer", "")))
+        user = _choice_to_index(user_answer)
+        return user == correct
 
     elif question.question_type == "multiple_choice":
-        correct_answers = content.get("correct_answers", content.get("correct_answer", []))
-        if isinstance(correct_answers, str):
-            correct_answers = json.loads(correct_answers)
-        if not isinstance(correct_answers, list):
-            correct_answers = [correct_answers]
-        correct_set = {_normalize(str(a)) for a in correct_answers}
-        user_set = {_normalize(a) for a in _parse_user_answers(user_answer)}
-        return user_set == correct_set
-
-    elif question.question_type == "fill_blank":
         correct_answers = content.get("correct_answers", content.get("correct_answer", []))
         if isinstance(correct_answers, str):
             try:
@@ -66,11 +71,16 @@ def grade_answer(question: Question, user_answer: str) -> bool | None:
                 correct_answers = [correct_answers]
         if not isinstance(correct_answers, list):
             correct_answers = [correct_answers]
-        normalized_user = _normalize(user_answer)
-        return any(_normalize(str(ans)) == normalized_user for ans in correct_answers)
+        correct_set = {_choice_to_index(str(a)) for a in correct_answers}
+        user_set = {_choice_to_index(a) for a in _parse_user_answers(user_answer)}
+        return user_set == correct_set
+
+    elif question.question_type == "fill_blank":
+        # Subjective — let user self-judge after seeing AI explanation
+        return None
 
     elif question.question_type in ("short_answer", "calculation", "proof"):
-        # Subjective; needs AI grading
+        # Subjective — needs user self-judge
         return None
 
     # Unknown type — treat as subjective

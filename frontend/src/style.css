@@ -12,7 +12,7 @@
   /* Ink palette */
   --ink-primary: #1a1a2e;
   --ink-secondary: #4a4a5a;
-  --ink-muted: #8a8a9a;
+  --ink-muted: #71718a;
   --ink-placeholder: #b0b0ba;
 
   /* Accent — subdued vermillion + indigo */
@@ -192,6 +192,24 @@ h3 { font-size: var(--text-xl); }
   color: var(--ink-primary);
 }
 
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn-icon:hover {
+  background: var(--surface-2);
+  color: var(--ink-primary);
+}
+
 /* ===== Inputs ===== */
 .input {
   width: 100%;
@@ -284,6 +302,258 @@ h3 { font-size: var(--text-xl); }
 .stagger > *:nth-child(8) { animation-delay: 0.4s; }
 .stagger > *:nth-child(9) { animation-delay: 0.45s; }
 .stagger > *:nth-child(10) { animation-delay: 0.5s; }
+
+/* ===== Dark theme ===== */
+.dark {
+  --surface-0: #15151e;
+  --surface-1: #1e1e2a;
+  --surface-2: #282838;
+  --surface-card: #1a1a28;
+
+  --ink-primary: #e8e8f0;
+  --ink-secondary: #a0a0b8;
+  --ink-muted: #6a6a80;
+  --ink-placeholder: #555570;
+
+  --accent: #e07b6a;
+  --accent-soft: #3a2020;
+  --accent-hover: #f09080;
+  --accent-indigo: #7a8aba;
+  --accent-indigo-soft: #1e2840;
+
+  --success: #6a9c68;
+  --success-soft: #1a2a1a;
+  --warning: #d4b868;
+  --warning-soft: #2a2518;
+  --error: #e07b6a;
+  --error-soft: #2a1a1a;
+
+  --border: #333348;
+  --border-light: #2a2a3c;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+.dark body::before { opacity: 0.08; }
+.dark .card { background: var(--surface-card); }
+.dark .btn-primary { background: var(--ink-primary); color: var(--surface-0); }
+.dark .btn-primary:hover:not(:disabled) { background: #c8c8e0; }
+.dark .prose { color: var(--ink-primary); }
+.dark .prose h1, .dark .prose h2, .dark .prose h3 { color: var(--ink-primary); }
+.dark .prose strong { color: var(--ink-primary); }
+
+/* ===== Landscape / wide-screen adaptation ===== */
+@media (orientation: landscape) and (max-height: 600px) {
+  /* Practice: question left, options right */
+  .landscape-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+  .landscape-split .question-area {
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+  }
+
+  /* Tighter spacing on short screens */
+  .card { padding: 0.75rem 1rem !important; }
+  h1 { font-size: 1.25rem !important; }
+  h2 { font-size: 1.125rem !important; }
+  .text-lg { font-size: 0.95rem !important; }
+
+  /* Smaller option buttons */
+  .quiz-option-btn { padding: 0.5rem 0.75rem !important; }
+
+  /* Keep chapter rows inline in landscape (enough width) */
+  .chapter-row__actions {
+    flex-wrap: nowrap !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+  }
+
+  /* Daily plan card: buttons stay icon-only, top-right */
+  .daily-plan-actions {
+    position: absolute !important;
+    top: 0.5rem !important;
+    right: 0.5rem !important;
+  }
+
+  /* Reduce page top padding for more content */
+  .animate-fade-in-up {
+    padding-top: 0.5rem !important;
+  }
+
+  /* ── Height constraints for scroll areas ── */
+  .force-scroll-y {
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+  }
+
+  /* Admin/Vault file browser */
+  .vault-split {
+    height: calc(100vh - 160px) !important;
+  }
+  .vault-split > .flex-1 {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+  }
+
+  /* Classroom two-column: reduce to single column with scroll */
+  .classroom-grid {
+    grid-template-columns: 1fr !important;
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+  }
+
+  /* Review page: constrain card height */
+  .review-card {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+  }
+
+  /* Notes editor: shorter */
+  .note-editor-area {
+    height: calc(100vh - 220px) !important;
+  }
+
+  /* ── Padding reduction ── */
+  .animate-fade-in-up { padding-bottom: 0.5rem !important; }
+  .py-8 { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+  .p-8 { padding: 0.75rem !important; }
+  .p-10 { padding: 0.75rem !important; }
+  .p-6 { padding: 0.5rem 0.75rem !important; }
+  .sm\\:p-8 { padding: 0.75rem !important; }
+  .sm\\:p-10 { padding: 0.75rem !important; }
+
+  /* ── Button compacting ── */
+  .btn { min-height: 32px !important; padding: 0.4rem 0.75rem !important; }
+  .py-3\\.5 { padding-top: 0.4rem !important; padding-bottom: 0.4rem !important; }
+
+  /* ── Height overrides ── */
+  .min-h-\\[300px\\] { min-height: 120px !important; }
+  .min-h-\\[200px\\] { min-height: 80px !important; }
+
+  /* ── Navigation compaction ── */
+  .nav-link, .nav-pill { padding: 0.3rem 0.5rem !important; min-height: 32px !important; }
+  .mobile-nav-link { padding: 0.4rem 0.6rem !important; font-size: 0.8rem !important; }
+
+  /* ── Chapter rows: button flex override ── */
+  .chapter-row__actions .btn { flex: 0 0 auto !important; }
+
+  /* Tab bars / headers: smaller */
+  .page-header { padding: 0.5rem 0 !important; }
+  .page-header h1 { font-size: 1.1rem !important; }
+
+  /* AI fullscreen: compact header */
+  .ai-full-header { padding: 0.4rem 1rem !important; }
+
+  /* Mobile menu: smaller items */
+  .mobile-nav-link { padding: 0.5rem 0.75rem !important; font-size: 0.85rem !important; }
+}
+
+/* Portrait: mobile stacking — only under 640px wide */
+@media (orientation: portrait) and (max-width: 639px) {
+  .chapter-row__actions {
+    flex-wrap: wrap !important;
+    flex: 1 0 100% !important;
+    width: 100% !important;
+  }
+
+  .daily-plan-actions {
+    position: static !important;
+    display: flex;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Full-width cards */
+  .card { border-radius: 0.5rem !important; }
+
+  /* Two-column grids → single column */
+  .classroom-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Vault browser: stack vertically */
+  .vault-split {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+  .vault-split > * {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+
+  /* Notes: full width */
+  .note-editor-area {
+    height: calc(100vh - 240px) !important;
+  }
+}
+
+@media (min-width: 640px) and (max-height: 500px) {
+  /* Desktop landscape: full split layout */
+  .practice-container {
+    max-width: 56rem !important;
+  }
+}
+
+/* ===== Focus styles (accessibility) ===== */
+.btn:focus-visible,
+.nav-link:focus-visible,
+.tree-row:focus-visible,
+.tree-toggle:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent-indigo);
+  outline-offset: 2px;
+}
+
+/* ===== Touch manipulation — eliminate 300ms tap delay ===== */
+button, a, .nav-pill, .nav-link, .mobile-nav-link,
+.sel-btn, [role="button"], input, textarea, select,
+.card-interactive, .tree-row, .tree-toggle, .quiz-option-btn,
+.ai-float__btn, .ai-float__header, .btn {
+  touch-action: manipulation;
+}
+
+/* ===== iOS input font-size fix (prevents auto-zoom on focus) ===== */
+@supports (-webkit-touch-callout: none) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+
+/* ===== Mobile fixes ===== */
+@media (max-width: 640px) {
+  .card {
+    padding: 0.75rem !important;
+  }
+  /* Let cards and containers use full width */
+  .max-w-2xl, .max-w-3xl, .max-w-4xl {
+    max-width: 100% !important;
+  }
+  /* Prevent overflow on KaTeX formulas */
+  .katex-display {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .katex {
+    font-size: 1em !important;
+  }
+  /* Better touch targets — 44px minimum */
+  .btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  /* iOS input/textarea: force 16px to prevent auto-zoom */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
 
 /* ===== Utility ===== */
 .sr-only {

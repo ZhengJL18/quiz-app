@@ -7,15 +7,25 @@ venv/
 
 # Database
 data/*.db
+data/*.db-wal
+data/*.db-shm
 data/*.sqlite3
 
 # Environment
 .env
 .env.local
+.env.production
 
 # Frontend
 frontend/node_modules/
 frontend/dist/
+
+# Backups
+backups/
+
+# Cloudflare Tunnel (generated)
+docker-compose.cf-tunnel.yml
+tunnel-config.yml
 
 # IDE
 .vscode/
@@ -24,3 +34,7 @@ frontend/dist/
 # OS
 .DS_Store
 Thumbs.db
+android/app/build/
+android/build/
+android/.gradle/
+android/captures/

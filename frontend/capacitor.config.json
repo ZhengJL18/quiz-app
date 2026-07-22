@@ -1,0 +1,9 @@
+{
+  "appId": "com.sanyi.quiz",
+  "appName": "三一",
+  "webDir": "dist",
+  "server": {},
+  "android": {
+    "allowMixedContent": true
+  }
+}

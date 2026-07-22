@@ -28,6 +28,7 @@ class PurePracticeRequest(BaseModel):
     subject_id: int
     chapter_id: Optional[int] = None
     count: int = 1
+    question_ids: Optional[list[int]] = None  # If provided, use these exact questions
 
 
 class PurePracticeResponse(BaseModel):
@@ -45,7 +46,8 @@ class SubmitAnswerRequest(BaseModel):
 
 class SubmitAnswerResponse(BaseModel):
     is_correct: Optional[bool] = None
-    explanation: str
+    explanation: str = ""
+    grading_mode: str = "auto"  # "auto" for objective, "self" for subjective (user self-judges)
     next_question: Optional[QuestionOut] = None
 
 

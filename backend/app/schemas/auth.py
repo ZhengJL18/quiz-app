@@ -1,5 +1,5 @@
 """Auth schemas."""
-
+from typing import Optional
 from pydantic import BaseModel
 
 
@@ -8,13 +8,20 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class SignupRequest(BaseModel):
+    username: str
+    password: str
+    api_key: Optional[str] = None
+
+
 class UserOut(BaseModel):
     id: int
     username: str
+    role: str
+    api_key_masked: Optional[str] = None
     is_active: bool
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class TokenResponse(BaseModel):

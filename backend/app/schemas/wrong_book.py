@@ -17,6 +17,7 @@ class WrongBookOut(BaseModel):
     ai_explanation: Optional[str] = None
     user_note: Optional[str] = None
     mastery_status: str
+    bookmarked: bool = False
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -32,3 +33,4 @@ class WrongBookUpdate(BaseModel):
     ai_explanation: Optional[str] = None
     user_note: Optional[str] = None
     mastery_status: Optional[str] = None
+    bookmarked: Optional[bool] = None

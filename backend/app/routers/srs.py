@@ -23,13 +23,14 @@ router = APIRouter()
 @router.get("/review-today", response_model=list[SRSReviewItem])
 def get_review_today(
     db: Session = Depends(get_db),
-    _user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
-    """Return all SRS entries due for review (next_review_at <= now)."""
+    """Return all SRS entries due for review."""
     now = datetime.now(timezone.utc)
     srs_entries = (
         db.query(SRSSchedule)
-        .filter(SRSSchedule.next_review_at <= now)
+        .join(WrongBook, SRSSchedule.wrong_book_id == WrongBook.id)
+        .filter(SRSSchedule.next_review_at <= now, WrongBook.user_id == current_user.id)
         .order_by(SRSSchedule.next_review_at.asc())
         .all()
     )
@@ -67,13 +68,13 @@ def get_review_today(
 def submit_review(
     body: SRSReviewRequest,
     db: Session = Depends(get_db),
-    _user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     """Submit a review quality rating and update the SRS schedule."""
     if body.quality < 0 or body.quality > 5:
         raise HTTPException(status_code=400, detail="Quality must be between 0 and 5")
 
-    wrong_entry = db.query(WrongBook).filter_by(id=body.wrong_book_id).first()
+    wrong_entry = db.query(WrongBook).filter_by(id=body.wrong_book_id, user_id=current_user.id).first()
     if not wrong_entry:
         raise HTTPException(status_code=404, detail="Wrong book entry not found")
 

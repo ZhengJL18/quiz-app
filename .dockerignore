@@ -1,0 +1,16 @@
+.git
+.gitignore
+__pycache__/
+*.py[cod]
+.env
+.env.*
+data/*.db
+data/*.db-wal
+data/*.db-shm
+data/vault/
+frontend/node_modules/
+.venv/
+venv/
+*.md
+!README.md
+.claude/

@@ -8,8 +8,8 @@
       v-for="i in 5"
       :key="i"
       class="text-sm transition-all duration-300"
-      :class="i <= starLevel ? 'text-[var(--warning)]' : 'text-[var(--border)]'"
-      :style="{ animationDelay: `${(i - 1) * 0.06}s` }"
+      :class="i <= starLevel ? 'text-[var(--star-color)]' : 'text-[var(--border)]'"
+      :style="{ color: i <= starLevel ? starColor(i) : undefined, animationDelay: `${(i - 1) * 0.06}s` }"
     >
       {{ i <= starLevel ? '★' : '☆' }}
     </span>
@@ -21,4 +21,9 @@ defineProps({
   starLevel: { type: Number, default: 0 },
   score: { type: Number, default: 0 },
 })
+
+const STAR_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4']
+function starColor(level) {
+  return STAR_COLORS[level - 1] || STAR_COLORS[0]
+}
 </script>
