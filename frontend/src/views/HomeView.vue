@@ -293,6 +293,11 @@ onMounted(async () => {
     subjects.value = res.data
     if (subjects.value.length > 0) {
       selectSubject(subjects.value[0])
+      // 已有科目的用户不弹引导
+      if (!localStorage.getItem('onboarded')) {
+        localStorage.setItem('onboarded', 'true')
+        showOnboarding.value = false
+      }
     }
   } catch (e) {
     console.error('Failed to load subjects', e)

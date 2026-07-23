@@ -290,19 +290,41 @@ class VaultManager:
     # ── Onboarding ──
 
     def onboard(self, subjects: list[str], goal: str, learning_style: str) -> dict:
-        """Run the 3-step onboarding wizard and populate initial vault."""
+        """Run the 3-step onboarding wizard and populate initial vault + DB."""
+        from app.db.engine import SessionLocal
+        from app.db.models import Subject
+        
         results = {}
 
-        # Step 1: Create knowledge structure
+        # Step 1: Create knowledge structure + DB subjects
         idx_lines = ["# 科目索引\n"]
-        for subj_name in subjects:
-            subj_dir = self.root / "knowledge" / subj_name
-            subj_dir.mkdir(parents=True, exist_ok=True)
-            mastery_md = subj_dir / "mastery.md"
-            if not mastery_md.exists():
-                self._write_file(mastery_md, f"---\nsubject: {subj_name}\nupdated: {datetime.now(timezone.utc).isoformat()}\n---\n\n# 掌握度矩阵\n\n（练习后自动填充）\n")
-            idx_lines.append(f"- {subj_name}")
-            results[subj_name] = "created"
+        db = SessionLocal()
+        try:
+            for i, subj_name in enumerate(subjects):
+                subj_dir = self.root / "knowledge" / subj_name
+                subj_dir.mkdir(parents=True, exist_ok=True)
+                mastery_md = subj_dir / "mastery.md"
+                if not mastery_md.exists():
+                    self._write_file(mastery_md, f"---\nsubject: {subj_name}\nupdated: {datetime.now(timezone.utc).isoformat()}\n---\n\n# 掌握度矩阵\n\n（练习后自动填充）\n")
+                idx_lines.append(f"- {subj_name}")
+                
+                # Create Subject record in DB (skip if already exists)
+                existing = db.query(Subject).filter_by(
+                    name=subj_name, user_id=self.user_id, is_active=True
+                ).first()
+                if not existing:
+                    db.add(Subject(
+                        user_id=self.user_id,
+                        name=subj_name,
+                        is_active=True,
+                        order_index=i,
+                    ))
+                    results[subj_name] = "created"
+                else:
+                    results[subj_name] = "already_exists"
+            db.commit()
+        finally:
+            db.close()
 
         self._write_file(self.root / "knowledge" / "index.md", "\n".join(idx_lines))
 
