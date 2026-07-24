@@ -4,30 +4,56 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load .env for local dev (ignored in production)
+# Load .env from project root (backend/.env or quiz-app/.env)
 ENV_PATH = Path(__file__).resolve().parent.parent.parent / ".env"
 if ENV_PATH.exists():
     load_dotenv(ENV_PATH)
 else:
+    # Fallback: try backend/.env
     load_dotenv(Path(__file__).resolve().parent.parent / ".env")
-
-# Data directory (local: ../data, Railway: /data volume)
-DATA_DIR = Path(os.getenv("DATA_DIR", str(Path(__file__).resolve().parent.parent.parent / "data")))
 
 
 class Settings:
-    DEEPSEEK_API_KEY: str = os.getenv("DEEPSEEK_API_KEY", "")
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL",
-        f"sqlite:///{DATA_DIR / 'quiz.db'}"
+        f"sqlite:///{Path(__file__).resolve().parent.parent.parent / 'data' / 'quiz.db'}"
     )
     JWT_SECRET: str = os.getenv("JWT_SECRET", "dev-secret-change-in-production")
-    JWT_EXPIRATION_HOURS: int = int(os.getenv("JWT_EXPIRATION_HOURS", "720"))
+    JWT_EXPIRATION_HOURS: int = int(os.getenv("JWT_EXPIRATION_HOURS", "24"))
     JWT_ALGORITHM: str = "HS256"
-    PORT: int = int(os.getenv("PORT", "8001"))
 
-    # Frontend static files (only used locally)
-    FRONTEND_DIST: Path = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+    # Frontend static files path (can be overridden via FRONTEND_DIST env var for Docker)
+    FRONTEND_DIST: Path = Path(
+        os.getenv(
+            "FRONTEND_DIST",
+            str(Path(__file__).resolve().parent.parent.parent / "frontend" / "dist")
+        )
+    )
+
+    # CORS — comma-separated origins, defaults to localhost dev
+    CORS_ORIGINS: list[str] = os.getenv(
+        "CORS_ORIGINS",
+        "http://localhost:5173,http://localhost:8001,https://localhost:8001,http://localhost,https://localhost,capacitor://localhost,https://311007.xyz,https://www.311007.xyz,https://quiz.312233.xyz"
+    ).split(",")
 
 
 settings = Settings()
+
+
+def ensure_production_secrets() -> None:
+    """Refuse to start in production if any secret uses its dev default.
+
+    Only enforced when NOT in uvicorn reload mode (i.e. production).
+    Reload detection: uvicorn sets the env var `UVICORN_RELOAD` to `'true'`.
+    Call this from main.py's lifespan, NOT at import time.
+    """
+    import os as _os
+    if _os.getenv("UVICORN_RELOAD", "").lower() == "true":
+        return  # dev reload — allow defaults
+
+    errors: list[str] = []
+    if settings.JWT_SECRET == "dev-secret-change-in-production":
+        errors.append("JWT_SECRET is still the default 'dev-secret-change-in-production'")
+    if errors:
+        msg = "Production secret check FAILED:\n  " + "\n  ".join(errors)
+        raise RuntimeError(msg)

@@ -290,11 +290,12 @@ def seed(db, reset=False):
         user = User(
             username="admin",
             password_hash=_bcrypt.hashpw(b"admin123", _bcrypt.gensalt()).decode(),
+            role="superadmin",
             is_active=True,
         )
         db.add(user)
         db.flush()
-        print("Created user: admin / admin123")
+        print("Created superadmin: admin / admin123")
     else:
         print("User 'admin' already exists, skipping.")
 

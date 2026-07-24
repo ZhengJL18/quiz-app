@@ -1,0 +1,17 @@
+- main [ref=e57]:
+  - generic [ref=e60]:
+    - generic [ref=e61]:
+      - generic [ref=e62]: 三
+      - heading "三一" [level=1] [ref=e63]
+      - paragraph [ref=e64]: 学而时习之
+    - generic [ref=e65]:
+      - button "登录" [ref=e66]
+      - button "注册" [ref=e67]
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - generic [ref=e70]: 用户名
+        - textbox "输入用户名" [ref=e71]: 小企鹅
+      - generic [ref=e72]:
+        - generic [ref=e73]: 密码
+        - textbox "输入密码" [active] [ref=e74]: a200
+      - button "登录" [ref=e75] [cursor=pointer]

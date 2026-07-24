@@ -1,9 +1,9 @@
 <template>
   <button
-    class="w-full text-left px-4 py-3.5 rounded-lg border transition-all duration-200 group relative overflow-hidden"
+    class="quiz-option-btn w-full text-left px-4 py-3.5 rounded-lg border transition-all duration-200 group relative overflow-hidden"
     :class="optionClasses"
     :disabled="disabled"
-    @click="$emit('select', value)"
+    @click.stop="$emit('select', value)"
   >
     <div class="flex items-start gap-3">
       <!-- Selection indicator -->
@@ -25,8 +25,8 @@
 
       <!-- Label -->
       <div class="flex-1 min-w-0">
-        <span class="text-sm font-medium mr-2" :class="labelClasses">{{ labelKey }}.</span>
-        <span class="text-sm" :class="textClasses">{{ label }}</span>
+        <span class="text-sm font-medium mr-2" :class="labelClasses">{{ letterLabel }}.</span>
+        <span class="text-sm" :class="textClasses" v-html="label" />
       </div>
 
       <!-- Result icon -->
@@ -54,6 +54,12 @@ const props = defineProps({
 })
 
 defineEmits(['select'])
+
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+const letterLabel = computed(() => {
+  const idx = parseInt(props.labelKey)
+  return (!isNaN(idx) && idx >= 0 && idx < 26) ? LETTERS[idx] : props.labelKey
+})
 
 const optionClasses = computed(() => {
   if (props.showResult) {

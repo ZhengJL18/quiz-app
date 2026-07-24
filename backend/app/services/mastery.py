@@ -72,7 +72,7 @@ def recalculate_chapter_mastery(
     accuracy_score = ((correct_count + 1) / (total + 2)) * 100.0
 
     # ---- 2. consistency_score (25%) — recent 30% vs older 70% ----
-    attempts_sorted = sorted(attempts, key=lambda a: a.attempted_at or datetime.min.replace(tzinfo=timezone.utc))
+    attempts_sorted = sorted(attempts, key=lambda a: a.attempted_at or datetime(1970, 1, 1, tzinfo=timezone.utc))
     if total < 10:
         consistency_score = 100.0
     else:

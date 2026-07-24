@@ -19,6 +19,7 @@ class ChapterUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     order_index: Optional[int] = None
+    parent_chapter_id: Optional[int] = None
     is_leaf: Optional[bool] = None
 
 
@@ -51,6 +52,7 @@ class ChapterTreeNode(BaseModel):
     name: str
     level: int
     order_index: int
+    parent_chapter_id: Optional[int] = None
     is_leaf: bool
     mastery: Optional[MasterySummary] = None
     question_count: int = 0

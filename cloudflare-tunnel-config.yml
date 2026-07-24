@@ -1,0 +1,18 @@
+# Cloudflare Tunnel configuration for 三一 Quiz App
+#
+# Prerequisites:
+#   1. Install cloudflared: https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/
+#   2. Authenticate: cloudflared tunnel login
+#   3. Create tunnel:  cloudflared tunnel create san yi-quiz
+#   4. Configure DNS:  cloudflared tunnel route dns san yi-quiz quiz.yourdomain.com
+#   5. Copy the tunnel credentials JSON to this directory as tunnel-credentials.json
+#
+# Start: cloudflared tunnel run san yi-quiz
+
+tunnel: YOUR_TUNNEL_ID
+credentials-file: /path/to/tunnel-credentials.json
+
+ingress:
+  - hostname: quiz.yourdomain.com
+    service: http://localhost:5173
+  - service: http_status:404

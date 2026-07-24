@@ -16,6 +16,18 @@ export const useAuthStore = defineStore('auth', () => {
     return res.data
   }
 
+  async function signup(username, password, apiKey) {
+    const body = { username, password }
+    if (apiKey) body.api_key = apiKey
+    const res = await client.post('/auth/signup', body)
+    token.value = res.data.access_token
+    user.value = res.data.user
+    localStorage.setItem('token', token.value)
+    return res.data
+  }
+
+  const isAdmin = computed(() => user.value?.role === 'admin' || user.value?.role === 'superadmin')
+
   function logout() {
     token.value = ''
     user.value = null
@@ -31,5 +43,5 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { token, user, isLoggedIn, login, logout, fetchMe }
+  return { token, user, isLoggedIn, isAdmin, login, signup, logout, fetchMe }
 })

@@ -18,9 +18,9 @@ def list_questions(
     question_type: str = Query(None),
     difficulty: int = Query(None, ge=1, le=5),
     db: Session = Depends(get_db),
-    _user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
-    q = db.query(Question)
+    q = db.query(Question).join(Subject).filter(Subject.user_id == current_user.id)
     if subject_id:
         q = q.filter(Question.subject_id == subject_id)
     if chapter_id:
